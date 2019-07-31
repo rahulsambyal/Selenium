@@ -1,0 +1,47 @@
+package com.test.readImage;
+
+import java.io.File;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.io.FileHandler;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import net.sourceforge.tess4j.ITesseract;
+import net.sourceforge.tess4j.Tesseract;
+import net.sourceforge.tess4j.TesseractException;
+
+public class ReadImage {
+	public static void main(String args[]) throws Exception{
+		System.setProperty("webdriver.chrome.driver", "C:\\Users\\rahsamya\\Documents\\Automation\\chromedriver.exe");
+		ChromeOptions opt= new ChromeOptions();
+		opt.addArguments("--disable-notifications");
+		WebDriver driver= new ChromeDriver(opt);
+		driver.get("https://www.irctc.co.in/nget/train-search");
+		driver.manage().window().maximize();
+		WebDriverWait wait= new WebDriverWait(driver, 10);
+		WebElement login= driver.findElement(By.id("loginText"));
+		wait.until(ExpectedConditions.elementToBeClickable(login));
+		login.click();
+		System.out.println("clicked on login");
+		Thread.sleep(5000);
+		WebElement captcha = driver.findElement(By.xpath("//img[@id='captchaImg']"));
+		System.out.println("captcha webelement created");
+		wait.until(ExpectedConditions.visibilityOf(captcha));
+		File src = captcha.getScreenshotAs(OutputType.FILE);
+		System.out.println("taken ss");
+		String path= System.getProperty("user.dir")+"/screenshots/captcha.png";
+		FileHandler.copy(src, new File(path));
+		ITesseract image= new Tesseract();
+		System.out.println("before");
+		String str=image.doOCR(new File(path));
+		System.out.println("after");
+		System.out.println("data from image is: "+ str);
+		
+	}
+}
